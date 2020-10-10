@@ -9,6 +9,7 @@ public class Movies {
     private int total_results;
     private int total_pages;
     private List<Results> results;
+    private List<Trailer> trailerList;
 
     public int getPage() {
         return page;
@@ -24,5 +25,9 @@ public class Movies {
 
     public List<Results> getResults() {
         return results;
+    }
+
+    public List<Trailer> getTrailerList() {
+        return trailerList;
     }
 }

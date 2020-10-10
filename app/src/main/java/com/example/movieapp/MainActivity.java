@@ -3,11 +3,13 @@ package com.example.movieapp;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CompoundButton;
@@ -15,6 +17,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.movieapp.room.MovieDatabase;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -36,11 +39,14 @@ public class MainActivity extends AppCompatActivity {
     TextView popular, rating;
     String sort_by;
 
+    private static MovieDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        database = MovieDatabase.getInstance(MainActivity.this);
         recyclerView = findViewById(R.id.recyclerView);
         switchButton = findViewById(R.id.switch1);
         popular = findViewById(R.id.popular);
@@ -76,6 +82,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    public void insertMovie(Results movie){
+        new InsertTask().execute(movie);
+    }
+    private static class InsertTask extends AsyncTask<Results,Void,Void>{
+        @Override
+        protected Void doInBackground(Results... movies) {
+            if(movies != null && movies.length > 0){
+                database.getMovieDao().insertMovie(movies[0]);
+            }
+            return null;
+        }
+    }
+
     public void loadImages(){
         swipeRefreshLayout.setRefreshing(true);
 
@@ -85,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         MoviesApi api = retrofit.create(MoviesApi.class);
-        Call<Movies> call = api.getMovies(Utils.api_key,"ru-RU",sort_by);
+        Call<Movies> call = api.getMovies(Utils.api_key,"en-US",sort_by);
 
         call.enqueue(new Callback<Movies>() {
             @Override
@@ -100,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
                     recyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this,2));
                     recyclerView.setAdapter(adapter);
 
+
+
                     adapter.setOnMovieItemClickListener(new MoviesAdapter.MovieItemClick() {
                         @Override
                         public void onClick(int position) {
@@ -110,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                     });
-
                 }
             }
             @Override

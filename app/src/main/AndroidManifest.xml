@@ -12,10 +12,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".FavoriteActivity"></activity>
+        <activity android:name=".FavoriteActivity">
+
+        </activity>
         <activity
             android:name=".DetailsActivity"
-            android:theme="@style/MyTheme"></activity>
+            android:theme="@style/MyTheme"
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="DetailsActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
